@@ -868,6 +868,22 @@ table tbody tr td {
   }
 }
 
+@media screen and (max-width: 576px) {
+  .desktop-nav {
+    width: 40%;
+  }
+
+  .profile,
+  .hamburger,
+  .modal {
+    top: 15%;
+  }
+
+  .main-container {
+    margin-top: 18%;
+  }
+}
+
 @media screen and (max-width: 485px) {
   header {
     padding: 8px;
