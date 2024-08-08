@@ -879,6 +879,11 @@ table tbody tr td {
     padding: 3px;
   }
 
+  .profile,
+  .hamburger {
+    top: 16%;
+  }
+
   .profile-description {
     font-size: 12px;
   }
