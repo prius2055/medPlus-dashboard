@@ -511,6 +511,10 @@ table tbody tr td {
   .main-container {
     margin-top: 10%;
   }
+
+  .profile {
+    top: 14%;
+  }
 }
 
 @media screen and (max-width: 960px) {
@@ -840,6 +844,7 @@ table tbody tr td {
   }
 
   .desktop-nav {
+    display: flex;
     text-align: center;
     justify-content: center;
   }
@@ -863,13 +868,17 @@ table tbody tr td {
   }
 }
 
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 485px) {
   header {
     padding: 8px;
   }
 
   .logo {
     margin-bottom: 8%;
+  }
+  .desktop-nav {
+    width: 96%;
+    justify-content: space-between;
   }
 
   .desktop-nav li {
@@ -888,7 +897,7 @@ table tbody tr td {
 
   .profile,
   .modal {
-    top: 14%;
+    top: 16%;
   }
 
   .profile {
@@ -897,7 +906,7 @@ table tbody tr td {
 
   .hamburger {
     left: 3%;
-    top: 15%;
+    top: 16%;
   }
 
   .container {
@@ -1018,5 +1027,20 @@ table tbody tr td {
   }
   .profile {
     right: 3.5%;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .profile,
+  .hamburger {
+    top: 14%;
+  }
+  .chart-title {
+    font-size: 14px;
+  }
+
+  .options {
+    margin-top: 2%;
+    margin-bottom: 2%;
   }
 }
