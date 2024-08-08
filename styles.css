@@ -898,3 +898,13 @@ table tbody tr td {
     font-size: 14px;
   }
 }
+
+@media screen and (max-width: 375px) {
+  .profile,
+  .hamburger {
+    top: 20%;
+  }
+  .profile {
+    right: 2.5%;
+  }
+}
