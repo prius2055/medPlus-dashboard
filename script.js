@@ -1,26 +1,33 @@
-let allPatientData = [];
 let currentIndex = null;
 
-const credentials = btoa('coalition:skills-test');
-const url = 'https://fedskillstest.coalitiontechnologies.workers.dev';
+// In production credentials would be hidden through a backend proxy so they
+// are not exposed on client-side.
+// I have declared it here per the test's API setup.
 
-const patientHistory = document.querySelector('.patient-history');
-const hamburger = document.querySelector('.hamburger');
-const closeBtn = document.querySelector('.btn-close');
-const modal = document.querySelector('.modal');
-const diagHistoryTitle = document.querySelector('.history-heading');
-const chartContainer = document.querySelector('.chart-container-grp');
-const options = document.querySelector('.options');
+const credentials = btoa("coalition:skills-test");
 
-const patientsContainer = document.querySelector('.patients-container');
-const ctx = document.getElementById('chart');
+let chartDuration;
 
-const patientInfo = document.querySelector('.patient-info');
-const labInfo = document.querySelector('.lab-results');
-const patientDiagList = document.querySelector('.patient-diagnostic-list');
-const div = document.createElement('div');
+const url = "https://fedskillstest.coalitiontechnologies.workers.dev";
 
-const rateCards = document.querySelector('.rate-cards');
+const mainContainer = document.querySelector(".main-container");
+const patientHistory = document.querySelector(".patient-history");
+const hamburger = document.querySelector(".hamburger");
+const closeBtn = document.querySelector(".btn-close");
+const modal = document.querySelector(".modal");
+const diagHistoryTitle = document.querySelector(".history-heading");
+const chartContainer = document.querySelector(".chart-container-grp");
+const options = document.querySelector(".options");
+
+const patientsContainer = document.querySelector(".patients-container");
+const ctx = document.getElementById("chart");
+
+const patientInfo = document.querySelector(".patient-info");
+const labInfo = document.querySelector(".lab-results");
+const patientDiagList = document.querySelector(".patient-diagnostic-list");
+const div = document.createElement("div");
+
+const rateCards = document.querySelector(".rate-cards");
 
 let singleUser;
 let diagnosisHistorychart;
@@ -98,10 +105,10 @@ const temperatureSvg = `<svg id="temperature" xmlns="http://www.w3.org/2000/svg"
 // Helper functions for Chartjs custom legends
 const getOrCreateLegendList = (chart, id) => {
   const legendContainer = document.getElementById(id);
-  let listContainer = legendContainer.querySelector('ul');
+  let listContainer = legendContainer.querySelector("ul");
 
   if (!listContainer) {
-    listContainer = document.createElement('ul');
+    listContainer = document.createElement("ul");
     legendContainer.appendChild(listContainer);
   }
 
@@ -109,7 +116,7 @@ const getOrCreateLegendList = (chart, id) => {
 };
 
 const htmlLegendPlugin = {
-  id: 'htmlLegend',
+  id: "htmlLegend",
   afterUpdate(chart, args, options) {
     const ul = getOrCreateLegendList(chart, options.containerID);
     const [sysBp, diasBp] = options.bpResults;
@@ -124,58 +131,58 @@ const htmlLegendPlugin = {
     const items = chart.options.plugins.legend.labels.generateLabels(chart);
 
     items.forEach((item) => {
-      const li = document.createElement('li');
+      const li = document.createElement("li");
 
-      const boxSpan = document.createElement('span');
-      boxSpan.classList.add('box');
+      const boxSpan = document.createElement("span");
+      boxSpan.classList.add("box");
       boxSpan.style.background = item.fillStyle;
       boxSpan.style.borderColor = item.strokeStyle;
-      boxSpan.style.borderWidth = item.lineWidth + 'px';
+      boxSpan.style.borderWidth = item.lineWidth + "px";
 
-      boxSpan.style.marginRight = '10px';
+      boxSpan.style.marginRight = "10px";
 
-      const resultDescriptionContainer = document.createElement('p');
-      const valueContainer = document.createElement('p');
-      valueContainer.classList.add('value');
-      let levelContainer = document.createElement('p');
-      levelContainer.classList.add('level');
-      const boxContainer = document.createElement('div');
-      boxContainer.classList.add('box-description');
-      const valueAndLevelContainer = document.createElement('div');
+      const resultDescriptionContainer = document.createElement("p");
+      const valueContainer = document.createElement("p");
+      valueContainer.classList.add("value");
+      let levelContainer = document.createElement("p");
+      levelContainer.classList.add("level");
+      const boxContainer = document.createElement("div");
+      boxContainer.classList.add("box-description");
+      const valueAndLevelContainer = document.createElement("div");
 
       resultDescriptionContainer.style.color = item.fontColor;
 
       const resultDescription = document.createTextNode(item.text);
       const resultValue = document.createTextNode(
-        item.text.toLowerCase() === 'systolis'
+        item.text.toLowerCase() === "systolis"
           ? latestSys.value
-          : latestDias.value
+          : latestDias.value,
       );
 
       levelContainer.innerHTML =
-        item.text.toLowerCase() === 'systolis'
+        item.text.toLowerCase() === "systolis"
           ? `
        ${
-         latestSys.levels.toLowerCase().includes('higher')
+         latestSys.levels.toLowerCase().includes("higher")
            ? arrowUpSvg
-           : latestSys.levels.includes('lower')
-           ? arrowDownSvg
-           : ''
+           : latestSys.levels.includes("lower")
+             ? arrowDownSvg
+             : ""
        }
        <span>${latestSys.levels}</span>
      `
-          : item.text.toLowerCase() === 'diastolic'
-          ? `
+          : item.text.toLowerCase() === "diastolic"
+            ? `
        <span>${
-         latestDias.levels.toLowerCase().includes('higher')
+         latestDias.levels.toLowerCase().includes("higher")
            ? arrowUpSvg
-           : latestDias.levels.toLowerCase().includes('lower')
-           ? arrowDownSvg
-           : ''
+           : latestDias.levels.toLowerCase().includes("lower")
+             ? arrowDownSvg
+             : ""
        }</span>
        <span>${latestDias.levels}</span>
      `
-          : '';
+            : "";
 
       resultDescriptionContainer.appendChild(resultDescription);
       valueContainer.appendChild(resultValue);
@@ -206,78 +213,61 @@ const getDiagnosisRates = (recentHistory) => {
 
 // Helper function for creating Respiratory, temperature and heart beat cards
 function createRateCard(rate, cardClass, innerText, unit, svgIcon) {
-  const respiratoryDiv = document.createElement('div');
-  respiratoryDiv.classList.add(cardClass);
-  const svg = document.createElement('p');
-  svg.classList.add('svg');
-  const text = document.createElement('p');
-  text.classList.add('rate-text');
-  const value = document.createElement('p');
-  value.classList.add('rate-value');
-  const levelDiv = document.createElement('div');
-  levelDiv.classList.add('rate-level');
-  const level = document.createElement('p');
-
-  svg.innerHTML = svgIcon;
-  text.innerText = innerText;
-  value.innerText = rate.value + ' ' + unit;
-  levelDiv.innerHTML = rate.levels.toLowerCase().includes('higher')
+  const levelIcon = rate.levels.toLowerCase().includes("higher")
     ? arrowUpSvg
-    : rate.levels.toLowerCase().includes('lower')
-    ? arrowDownSvg
-    : '';
-  level.innerText = rate.levels;
+    : rate.levels.toLowerCase().includes("lower")
+      ? arrowDownSvg
+      : "";
 
-  levelDiv.appendChild(level);
+  const rateCardHTML = `
+    <div class="${cardClass}">
+      <p class="svg">${svgIcon}</p>
+      <p class="rate-text">${innerText}</p>
+      <p class="rate-value">${rate.value} ${unit}</p>
+      <div class="rate-level">
+        ${levelIcon}
+        <p>${rate.levels}</p>
+      </div>
+    </div>
+  `;
 
-  respiratoryDiv.appendChild(svg);
-  respiratoryDiv.appendChild(text);
-  respiratoryDiv.appendChild(value);
-  respiratoryDiv.appendChild(levelDiv);
-
-  rateCards.appendChild(respiratoryDiv);
+  rateCards.insertAdjacentHTML("beforeend", rateCardHTML);
 }
 
 //Helper function for Creating Diagnosis table
 const diagListTable = (data) => {
-  const heading = document.createElement('h2');
-  const tableDiv = document.createElement('div');
-  tableDiv.classList.add('table-container');
-  tableDiv.classList.add('scroll');
-  const diagnosticTable = document.createElement('table');
+  const rowsHTML = data
+    .map(
+      (tableData) => `
+        <tr>
+          <td>${tableData.name}</td>
+          <td>${tableData.description}</td>
+          <td>${tableData.status}</td>
+        </tr>
+      `,
+    )
+    .join(" ");
 
-  const diagnosticTableHead = document.createElement('thead');
-  const diagnosticTableBody = document.createElement('tbody');
-  const diagnosticTableRowHead = document.createElement('tr');
-
-  const td = document.createElement('th');
-  const td2 = document.createElement('th');
-  const td3 = document.createElement('th');
-
-  data.forEach(
-    (tableData) =>
-      (diagnosticTableBody.innerHTML += ` <tr> <td>${tableData.name}</td>
-    <td>${tableData.description}</td>
-    <td>${tableData.status}</td>
-    </tr>
-    `)
+  patientDiagList.insertAdjacentHTML(
+    "beforeend",
+    `
+      <h2>Diagnotic list</h2>
+      <div class="table-container scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Problem/Diagnosis</th>
+              <th>Description</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHTML}
+          </tbody>
+        </table>
+      </div>
+    `,
   );
-  heading.innerText = 'Diagnotic list';
-  td.innerText = 'Problem/Diagnosis';
-  td2.innerText = 'Description';
-  td3.innerText = 'Status';
-
-  diagnosticTableRowHead.appendChild(td);
-  diagnosticTableRowHead.appendChild(td2);
-  diagnosticTableRowHead.appendChild(td3);
-  diagnosticTableHead.appendChild(diagnosticTableRowHead);
-  diagnosticTable.appendChild(diagnosticTableHead);
-  diagnosticTable.appendChild(diagnosticTableBody);
-
-  tableDiv.appendChild(diagnosticTable);
-
-  patientDiagList.appendChild(heading);
-  patientDiagList.appendChild(tableDiv);
 };
 
 //Helper function for patient Bio data
@@ -463,9 +453,9 @@ const getLabResults = (data) => {
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
             <path id="download_FILL0_wght300_GRAD0_opsz24_1_" data-name="download_FILL0_wght300_GRAD0_opsz24 (1)" d="M190-765.45a1.282,1.282,0,0,1-.449-.077,1.106,1.106,0,0,1-.395-.264l-4.146-4.146a.94.94,0,0,1-.294-.7,1.025,1.025,0,0,1,.294-.709,1.019,1.019,0,0,1,.713-.321.944.944,0,0,1,.713.3L189-768.8V-779a.968.968,0,0,1,.287-.713A.968.968,0,0,1,190-780a.968.968,0,0,1,.713.287A.968.968,0,0,1,191-779v10.2l2.564-2.564a.952.952,0,0,1,.706-.294,1,1,0,0,1,.719.314,1.044,1.044,0,0,1,.3.7.932.932,0,0,1-.3.7l-4.146,4.146a1.1,1.1,0,0,1-.395.264A1.282,1.282,0,0,1,190-765.45ZM182.411-760a2.327,2.327,0,0,1-1.71-.7,2.327,2.327,0,0,1-.7-1.71v-2.615a.968.968,0,0,1,.287-.713.968.968,0,0,1,.713-.287.968.968,0,0,1,.713.287.968.968,0,0,1,.287.713v2.615a.392.392,0,0,0,.128.282.392.392,0,0,0,.282.128h15.179a.392.392,0,0,0,.282-.128.392.392,0,0,0,.128-.282v-2.615a.968.968,0,0,1,.287-.713.968.968,0,0,1,.713-.287.968.968,0,0,1,.713.287.968.968,0,0,1,.287.713v2.615a2.327,2.327,0,0,1-.7,1.71,2.327,2.327,0,0,1-1.71.7Z" transform="translate(-180.001 779.999)"/>
             </svg>
-           </div>`
+           </div>`,
               )
-              .join(' ')}
+              .join(" ")}
             </div> 
             
                
@@ -473,24 +463,23 @@ const getLabResults = (data) => {
 };
 
 //Helper functions for Recent diagnosis
-const getMonthNumber = (month) => {
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
 
-  return months.indexOf(month) + 1;
-};
+const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const getMonthNumber = (month) => MONTHS.indexOf(month) + 1;
 
 const recentDiagnosisHistory = (data, n) => {
   const sortedDiagnosis = data
@@ -524,10 +513,10 @@ const diastolicValues = (data) => {
 const getDateFormat = (data) => {
   const chartDateFormat = data.map((date) => {
     const dateInstance = new Date(`${date.month} 1, ${date.year}`);
-    const dateFormat = { year: 'numeric', month: 'short' };
+    const dateFormat = { year: "numeric", month: "short" };
     const diagnosisDate = dateInstance
-      .toLocaleString('en-US', dateFormat)
-      .replace(' ', ', ');
+      .toLocaleString("en-US", dateFormat)
+      .replace(" ", ", ");
     return diagnosisDate;
   });
   return chartDateFormat;
@@ -543,57 +532,63 @@ async function fetchPatientsData(url, credentials, duration, index) {
     });
 
     if (!response.ok) {
-      throw new Error('Network Error. Please check your network');
+      throw new Error("Network Error. Please check your network");
     }
     const data = await response.json();
-    console.log(index);
+
     getSingleUser(data, duration, index);
     getPatientList(data);
   } catch (error) {
-    console.error('Error:', error);
+    mainContainer.innerHTML = "";
+    const errorMessage = document.createElement("p");
+    errorMessage.classList.add("error-message");
+    errorMessage.textContent =
+      "Unable to load patient data. Please check your connection and try again.";
+    mainContainer.appendChild(errorMessage);
   }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener("DOMContentLoaded", () => {
   let duration = 6;
   fetchPatientsData(url, credentials, duration, currentIndex);
-  diagHistoryTitle.innerText = 'Diagnosis History';
+  diagHistoryTitle.innerText = "Diagnosis History";
   options.innerHTML = `<p class="chart-title">Blood Pressure</p>
                   <select class="chart-duration">
                     <option value='6'>Last 6 months</option>
                     <option value="9">Last 9 months</option>
                   </select>`;
 
-  chartContainer.style.backgroundColor = '#f4f0fe';
-  const chartDuration = document.querySelector('.chart-duration');
+  chartContainer.style.backgroundColor = "#f4f0fe";
 
-  chartDuration.addEventListener('change', (e) => {
+  chartDuration = document.querySelector(".chart-duration");
+
+  chartDuration.addEventListener("change", (e) => {
     e.preventDefault();
     const number = e.target.value;
     duration = Number(number);
-    console.log(currentIndex);
+
     fetchPatientsData(url, credentials, duration, currentIndex);
   });
 
-  hamburger.addEventListener('click', () => {
-    patientsContainer.style.display = 'flex';
-    modal.style.display = 'block';
-    closeBtn.style.display = 'block';
-    hamburger.style.display = 'none';
+  hamburger.addEventListener("click", () => {
+    patientsContainer.style.display = "flex";
+    modal.style.display = "block";
+    closeBtn.style.display = "block";
+    hamburger.style.display = "none";
   });
 
-  closeBtn.addEventListener('click', () => {
-    patientsContainer.style.display = 'none';
-    modal.style.display = 'none';
-    closeBtn.style.display = 'none';
-    hamburger.style.display = 'block';
+  closeBtn.addEventListener("click", () => {
+    patientsContainer.style.display = "none";
+    modal.style.display = "none";
+    closeBtn.style.display = "none";
+    hamburger.style.display = "block";
   });
 
-  modal.addEventListener('click', () => {
-    patientsContainer.style.display = 'none';
-    modal.style.display = 'none';
-    closeBtn.style.display = 'none';
-    hamburger.style.display = 'block';
+  modal.addEventListener("click", () => {
+    patientsContainer.style.display = "none";
+    modal.style.display = "none";
+    closeBtn.style.display = "none";
+    hamburger.style.display = "block";
   });
 });
 
@@ -621,26 +616,26 @@ const getPatientList = (allPatientData) => {
             .map(
               (data, index) => `
             <div class="${
-              currentIndex === null && data.name === 'Jessica Taylor'
-                ? 'patient active'
+              currentIndex === null && data.name === "Jessica Taylor"
+                ? "patient active"
                 : currentIndex === index
-                ? 'patient active'
-                : 'patient'
+                  ? "patient active"
+                  : "patient"
             }">
               <div class="patient-detail">
                 <img
                   src=${data.profile_picture}
                   alt="${
-                    data.gender === 'Female'
-                      ? 'Picture of smiling female patient'
-                      : 'Picture of smiling Male patient'
+                    data.gender === "Female"
+                      ? "Picture of smiling female patient"
+                      : "Picture of smiling Male patient"
                   }"
                 />
                 <div>
                   <p class="patient-name">${data.name}</p>
                   <p class="patient-bio"><span>${data.gender},</span><span>${
-                data.age
-              }</span></p>
+                    data.age
+                  }</span></p>
                 </div>
               </div>
 
@@ -659,24 +654,26 @@ const getPatientList = (allPatientData) => {
               </svg>
              </div>
             
-           `
+           `,
             )
-            .join(' ')}
+            .join(" ")}
         </div>
           
           </div>`;
 
   //Clicking patient
-  const allPatient = document.querySelectorAll('.patient');
-  const chartDuration = document.querySelector('.chart-duration');
+
+  chartDuration = document.querySelector(".chart-duration");
+
+  const allPatient = document.querySelectorAll(".patient");
 
   allPatient.forEach((patientNav, i) => {
-    patientNav.addEventListener('click', (e) => {
+    patientNav.addEventListener("click", (e) => {
       currentIndex = i;
       e.preventDefault();
-      allPatient.forEach((patient) => patient.classList.remove('active'));
-      patientNav.classList.add('active');
-      getSingleUser(allPatientData, (num = 6), currentIndex);
+      allPatient.forEach((patient) => patient.classList.remove("active"));
+      patientNav.classList.add("active");
+      getSingleUser(allPatientData, 6, currentIndex);
       chartDuration.value = 6;
     });
   });
@@ -688,12 +685,12 @@ const getSingleUser = (allPatientData, num, i) => {
     singleUser = allPatientData?.filter((data, index) => index === i)[0];
   } else {
     singleUser = allPatientData?.filter(
-      (data) => data.name === 'Jessica Taylor'
+      (data) => data.name === "Jessica Taylor",
     )[0];
   }
 
   const diagnosisHistory = singleUser?.diagnosis_history;
-  const duration = typeof num !== 'number' ? diagnosisHistory.length : num;
+  const duration = typeof num !== "number" ? diagnosisHistory.length : num;
   const recentHistory = recentDiagnosisHistory(diagnosisHistory, duration);
 
   const chartDates = getDateFormat(recentHistory);
@@ -711,24 +708,24 @@ const getSingleUser = (allPatientData, num, i) => {
 
   //The Chartjs method
   diagnosisHistorychart = new Chart(ctx, {
-    type: 'line',
+    type: "line",
     data: {
       labels: chartDates,
       datasets: [
         {
-          label: 'Systolis',
+          label: "Systolis",
           data: sysResult,
-          backgroundColor: '#C26EB4',
-          borderColor: '#C26EB4',
+          backgroundColor: "#C26EB4",
+          borderColor: "#C26EB4",
           borderWidth: 2,
           tension: 0.4,
           pointRadius: 6,
         },
         {
-          label: 'Diastolic',
+          label: "Diastolic",
           data: diasResult,
-          borderColor: '#7E6CAB',
-          backgroundColor: '#7E6CAB',
+          borderColor: "#7E6CAB",
+          backgroundColor: "#7E6CAB",
           borderWidth: 2,
           tension: 0.4,
           pointRadius: 6,
@@ -741,7 +738,7 @@ const getSingleUser = (allPatientData, num, i) => {
         y: {
           beginAtZero: false,
           ticks: {
-            color: '#072635',
+            color: "#072635",
             font: {
               size: 12,
             },
@@ -752,7 +749,7 @@ const getSingleUser = (allPatientData, num, i) => {
             display: false,
           },
           ticks: {
-            color: '#072635',
+            color: "#072635",
             font: {
               size: 12,
             },
@@ -761,7 +758,7 @@ const getSingleUser = (allPatientData, num, i) => {
       },
       plugins: {
         htmlLegend: {
-          containerID: 'legend-container',
+          containerID: "legend-container",
           bpResults: diagEntries,
         },
         legend: {
@@ -773,42 +770,42 @@ const getSingleUser = (allPatientData, num, i) => {
   });
 
   //Rate cards
-  rateCards.innerHTML = '';
+  rateCards.innerHTML = "";
   const diagnosisRates = getDiagnosisRates(recentHistory);
 
   createRateCard(
     diagnosisRates[0].respiratory,
-    'respiratory-card',
-    'Respiratory Rate',
-    'bpm',
-    respiratorySvg
+    "respiratory-card",
+    "Respiratory Rate",
+    "bpm",
+    respiratorySvg,
   );
   createRateCard(
     diagnosisRates[0].temperature,
-    'temperature-card',
-    'Temperature',
-    '°F',
-    temperatureSvg
+    "temperature-card",
+    "Temperature",
+    "°F",
+    temperatureSvg,
   );
   createRateCard(
     diagnosisRates[0].heartRate,
-    'heart-card',
-    'Heart Rate',
-    'bpm',
-    heartSvg
+    "heart-card",
+    "Heart Rate",
+    "bpm",
+    heartSvg,
   );
 
   //Diagnostic List
-  patientDiagList.innerHTML = '';
+  patientDiagList.innerHTML = "";
   const diagnosticList = singleUser?.diagnostic_list;
   diagListTable(diagnosticList);
 
   //Single user Bio-data
-  patientInfo.innerHTML = '';
+  patientInfo.innerHTML = "";
   getPatientBioData(singleUser);
 
   //Lab Results
-  labInfo.innerHTML = '';
+  labInfo.innerHTML = "";
   const labResults = singleUser?.lab_results;
   getLabResults(labResults);
 };

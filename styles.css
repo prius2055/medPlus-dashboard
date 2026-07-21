@@ -4,12 +4,20 @@
   box-sizing: border-box;
 }
 
+:root {
+  --color-primary: #072635;
+  --color-secondary: #707070;
+  --color-accent: #01f0d0;
+  --color-bg: #f6f7f8;
+  --error: #ff0000;
+}
+
 body {
-  font-family: 'Manrope', sans-serif;
+  font-family: "Manrope", sans-serif;
 }
 
 .container {
-  background-color: #f6f7f8;
+  background-color: var(--color-bg);
   padding: 18px;
   height: 100vh;
 }
@@ -49,7 +57,7 @@ header {
 .nav-link {
   text-decoration: none;
   margin-left: 9px;
-  color: #072635;
+  color: var(--color-primary);
 }
 
 .profile {
@@ -70,7 +78,7 @@ header {
 }
 
 .profile-title {
-  color: #707070;
+  color: var(--color-secondary);
 }
 
 .profile-icons {
@@ -136,7 +144,7 @@ header {
 }
 
 .scroll::-webkit-scrollbar-thumb {
-  background: #072635;
+  background: var(--color-primary);
   border-radius: 10px;
   border: 2px solid transparent;
   background-clip: content-box;
@@ -165,12 +173,12 @@ header {
 }
 .patient-name {
   margin-bottom: 5px;
-  color: #072635;
+  color: var(--color-primary);
   font-weight: 700;
 }
 
 .patient-bio {
-  color: #707070;
+  color: var(--color-secondary);
 }
 
 .patient-vitals-container {
@@ -351,7 +359,7 @@ header {
 }
 .info-name {
   text-align: center;
-  color: #072635;
+  color: var(--color-primary);
   font-size: 24px;
   margin-top: 2%;
   margin-bottom: 1%;
@@ -377,7 +385,7 @@ header {
 .patient-info button {
   padding: 4%;
   margin-top: 6%;
-  background-color: #01f0d0;
+  background-color: var(--color-accent);
   border-radius: 41px;
   border: none;
   font-size: 14px;
@@ -429,7 +437,7 @@ header {
 }
 
 .table-container thead {
-  background: #f6f7f8;
+  background: var(--color-bg);
 }
 
 .table-container thead tr {
@@ -452,7 +460,7 @@ header {
 
 table tbody tr td {
   padding: 18px;
-  border-bottom: 1px #f6f7f8 solid;
+  border-bottom: 1px var(--color-bg) solid;
 }
 
 .active {
@@ -460,9 +468,22 @@ table tbody tr td {
 }
 
 .current {
-  background-color: #01f0d0;
+  background-color: var(--color-accent);
   border-radius: 41px;
   padding: 11px 16px;
+}
+
+.error-message {
+  position: fixed;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--error);
+  background-color: #fff;
+  text-align: center;
+  padding: 20px;
 }
 
 @media screen and (max-width: 1200px) {
